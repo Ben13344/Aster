@@ -1,20 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Aster</title>
-    <style>
-        html { background: black; }
-        body { opacity: 0; }
-    </style>
-    <script src="/js/loader.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', loadBase);</script>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Game Site</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a0f; color: #fff; }
+    header {
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 2px solid #0f3460;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(90deg, #00d4ff, #7b2fff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    header p { color: #888; font-size: 0.95rem; }
+    .search-bar { display: flex; justify-content: center; padding: 20px; }
+    .search-bar input {
+      width: 100%; max-width: 500px; padding: 12px 20px;
+      border-radius: 30px; border: 1px solid #333;
+      background: #1a1a2e; color: #fff; font-size: 1rem; outline: none;
+    }
+    .search-bar input:focus { border-color: #00d4ff; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px; padding: 10px 24px 40px;
+    }
+    .card {
+      background: #1a1a2e; border-radius: 12px;
+      border: 1px solid #222; transition: transform 0.2s, border-color 0.2s;
+    }
+    .card:hover { transform: translateY(-4px); border-color: #00d4ff; }
+    .card a {
+      display: block; text-decoration: none; color: #fff;
+      padding: 20px 12px; text-align: center;
+    }
+    .card .icon { font-size: 2rem; margin-bottom: 8px; }
+    .card .name { font-size: 0.85rem; font-weight: 600; text-transform: capitalize; word-break: break-word; }
+    #noResults { text-align: center; color: #555; padding: 60px; font-size: 1.1rem; display: none; }
+  </style>
 </head>
 <body>
-    <div id="originalContent" class="content">
-        <img src="home-img.png" alt="Aster Logo" style="height: 400px; width: 800px;">
-        <br/>
-        <h1>ASTER IS SHUTTING DOWN FOR NOW IT SHOULD REOPEN NEXT SCHOOL YEAR AND IF YOU WANT TO MAKE YOUR OWN ASTER CREATE A ISSUE ON MY GITHUB PAGE</h1>
-    </div>
+
+<header>
+  <h1>🎮 My Game Site</h1>
+  <p>Hundreds of free games — click to play instantly</p>
+</header>
+
+<div class="search-bar">
+  <input type="text" id="search" placeholder="Search games..." oninput="filterGames()">
+</div>
+
+<div class="grid" id="gameGrid"></div>
+<div id="noResults">No games found.</div>
+
+<script>
+const games = [
+  ["10-minutes-till-dawn","🌙"],["1on1soccer","⚽"],["1v1lol","🔫"],["1v1space","🚀"],
+  ["2048","🧩"],["2048-cupcake","🧁"],["2048-multitask","🧠"],["2drocketleague","🚗"],
+  ["2sonic","💨"],["3sonic","💨"],["60sburgerrun","🍔"],["99balls","🎱"],
+  ["Blockblast","💥"],["DOOMORI","👾"],["DogeMiner","🐕"],["Dogeminer2","🐕"],
+  ["OfflineParadise","🏝️"],["Run 2","🏃"],["SURVIVOR","🪓"],["ShapeShootout","🔺"],
+  ["Stickman-Survival","🕹️"],["Trimps","⚔️"],["a-dance-of-fire-and-ice","🔥"],
+  ["achieveunlocked","🏆"],["achieveunlocked2","🏆"],["adarkroom","🕯️"],
+  ["adrenalinechallenge","🏎️"],["adventure-capitalist","💰"],["adventure-drivers","🚗"],
+  ["adventure","🗺️"],["advgta","🚗"],["ageofwar","⚔️"],["ageofwar2","⚔️"],
+  ["alienhominid","👽"],["align-4","🔴"],["amazing-rope-police","🚔"],
+  ["amidst-the-clouds","☁️"],["among-us","🚀"],["angelunder","👼"],
+  ["angry-sharks","🦈"],["animalcrossingwildworld","🌿"],["aquapark-slides","💦"],
+  ["astray","🌀"],["avalanche","❄️"],["awesometanks","🪖"],
+  ["backrooms","🟡"],["backrooms-2d","🟡"],["bacon-may-die","🥓"],
+  ["bad-ice-cream","🍦"],["bad-ice-cream-2","🍦"],["bad-ice-cream-3","🍦"],
+  ["balldodge","⚽"],["ballistic-chickens","🐔"],["basketballbros","🏀"],
+  ["basketballstars","🏀"],["basketrandom","🏀"],["battleforgondor","🏰"],
+  ["bigredbutton","🔴"],["bit-planes","✈️"],["bitlife","👤"],["blackknight","⚔️"],
+  ["drift-hunters","🏎️"],["adofai","🎵"],["adventure-capitalist","💰"],
+  ["amongus","🚀"],["balldodge","⚽"],["bitlife","👤"]
+];
+
+function renderGames(list) {
+  const grid = document.getElementById("gameGrid");
+  const noResults = document.getElementById("noResults");
+  grid.innerHTML = "";
+  if (list.length === 0) { noResults.style.display = "block"; return; }
+  noResults.style.display = "none";
+  list.forEach(([name, icon]) => {
+    const label = name.replace(/-/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+    grid.innerHTML += `
+      <div class="card">
+        <a href="${encodeURIComponent(name)}/index.html" target="_blank">
+          <div class="icon">${icon}</div>
+          <div class="name">${label}</div>
+        </a>
+      </div>`;
+  });
+}
+
+function filterGames() {
+  const q = document.getElementById("search").value.toLowerCase();
+  renderGames(games.filter(([name]) => name.includes(q)));
+}
+
+renderGames(games);
+</script>
 </body>
 </html>
